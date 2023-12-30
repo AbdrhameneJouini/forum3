@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
     public class User
     {
-
+    [Key]
     public int UserID { get; set; }
     public string Pseudonyme { get; set; }
     public string MotDePasse { get; set; }
@@ -17,6 +17,10 @@ using System.ComponentModel.DataAnnotations;
     public string Signature { get; set; }
     public bool Actif { get; set; } = true;
     public bool Admin { get; set; } = false;
+
+
+    public ICollection<FollowedMessages> FollowedMessages { get; set; }
+    public ICollection<Post> Posts { get; set; }
     public User()
     {
     }

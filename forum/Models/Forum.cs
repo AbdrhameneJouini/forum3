@@ -6,11 +6,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
     public class Forum
     {
-
-
+    [Key]
     public int ForumID { get; set; }
     public string Titre { get; set; }
     public DateTime DateCreation { get; set; }
-    public List<Theme> Themes { get; internal set; }
+    public ICollection<Theme> Themes { get;  set; }
 }
 

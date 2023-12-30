@@ -2,13 +2,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using forum.Data;
 using forum.Areas.Identity.Data;
+using forum.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("forumDBContextConnection") ?? throw new InvalidOperationException("Connection string 'forumDBContextConnection' not found.");
 
-builder.Services.AddDbContext<forumDBContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<ForumDbContext>(options => options.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<AuthenUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<forumDBContext>();
+builder.Services.AddDefaultIdentity<AuthenUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<ForumDbContext>(); // Corrected to use ForumDbContext
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
