@@ -1,7 +1,18 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using forum.Data;
+using forum.Areas.Identity.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("forumDBContextConnection") ?? throw new InvalidOperationException("Connection string 'forumDBContextConnection' not found.");
+
+builder.Services.AddDbContext<forumDBContext>(options => options.UseSqlServer(connectionString));
+
+builder.Services.AddDefaultIdentity<AuthenUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<forumDBContext>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
@@ -23,5 +34,6 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapRazorPages();
 
 app.Run();
