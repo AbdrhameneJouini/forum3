@@ -6,11 +6,11 @@
 
 <p>@ViewData["DbConnectionTest"]</p>
 
-
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
 @{
     DatabaseConnector dbConnector = new DatabaseConnector();
     bool isConnected = dbConnector.TestConnection();
@@ -24,3 +24,5 @@ else
 {
     <p style="color: red;">Failed to connect to the database.</p>
 }
+
+@await Html.PartialAsync("~/Views/Theme/Create.cshtml")

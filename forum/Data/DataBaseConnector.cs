@@ -5,7 +5,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 public class DatabaseConnector
 {
-    private string connectionString = "Data Source=localhost;Initial Catalog=Forum;Integrated Security=True";
+    private string  connectionString = "Data Source=localhost;Initial Catalog=Forum;Integrated Security=True";
 
     public bool TestConnection()
     {

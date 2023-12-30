@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
     public class User
     {
+
     public int UserID { get; set; }
     public string Pseudonyme { get; set; }
     public string MotDePasse { get; set; }

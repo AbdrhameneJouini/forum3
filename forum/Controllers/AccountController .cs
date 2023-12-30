@@ -10,4 +10,5 @@ namespace forum.Controllers
 {
     public class AccountController : Controller
     {
+    }
 }
