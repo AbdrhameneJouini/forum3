@@ -1,8 +1,26 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+@using forum.Data
+<h2>@ViewData["Message"]</h2>
+
+<p>@ViewData["DbConnectionTest"]</p>
+
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+@{
+    DatabaseConnector dbConnector = new DatabaseConnector();
+    bool isConnected = dbConnector.TestConnection();
+}
+
+@if (isConnected)
+{
+    <p style="color: green;">Database connection successful!</p>
+}
+else
+{
+    <p style="color: red;">Failed to connect to the database.</p>
+}
