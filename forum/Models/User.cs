@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 
-    public class User
-    {
+public class User
+{
     [Key]
     public int UserID { get; set; }
     public string Pseudonyme { get; set; }
@@ -35,7 +35,7 @@ using System.ComponentModel.DataAnnotations;
     }
 
     // Constructor with parameters to set all properties including UserID
-  
+
     public User(int userID, string pseudonyme, string motDePasse, string email, bool inscrit, bool valide, string cheminAvatar, string signature, bool actif, bool admin)
     {
         UserID = userID;
@@ -49,7 +49,5 @@ using System.ComponentModel.DataAnnotations;
         Actif = actif;
         Admin = admin;
     }
-    
+
 }
-
-

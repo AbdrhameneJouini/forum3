@@ -41,6 +41,9 @@ namespace forum.Controllers;
                 return View(user);
             }
 
+
+            
+
             private bool AuthenticateUser(User user)
             {
                 using (SqlConnection connection = dbConnector.getConnection())

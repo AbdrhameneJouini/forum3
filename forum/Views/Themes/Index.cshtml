@@ -25,6 +25,7 @@
                     @Html.DisplayFor(modelItem => item.Titre)
                 </td>
                 <td>
+                    <a asp-controller="Home" asp-action="Index" asp-route-id="@item.ThemeID">Go Home</a> |
                     <a asp-action="Edit" asp-route-id="@item.ThemeID">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.ThemeID">Details</a> |
                     <a asp-action="Delete" asp-route-id="@item.ThemeID">Delete</a>
