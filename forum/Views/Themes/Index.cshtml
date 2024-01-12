@@ -5,10 +5,19 @@
     }
 
     <h1>Index</h1>
+    
+    
+    @if (User.IsInRole("admin"))
+    {
+        <p>
+            <a asp-action="Create">Create New</a>
+        </p>
 
-    <p>
-        <a asp-action="Create">Create New</a>
-    </p>
+    }
+    
+    
+
+   
     <table class="table">
         <thead>
             <tr>
@@ -25,10 +34,26 @@
                     @Html.DisplayFor(modelItem => item.Titre)
                 </td>
                 <td>
-                    <a asp-controller="Home" asp-action="Index" asp-route-id="@item.ThemeID">Go Home</a> |
-                    <a asp-action="Edit" asp-route-id="@item.ThemeID">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.ThemeID">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.ThemeID">Delete</a>
+                    
+                    
+                    @if (User.IsInRole("admin"))
+                    {
+
+
+                        <a asp-action="Edit" asp-route-id="@item.ThemeID">Edit  | </a> 
+
+                    }
+                   
+                    <a asp-action="Details" asp-route-id="@item.ThemeID">Details</a>
+                    
+                    @if (User.IsInRole("admin"))
+                    {
+
+                        <a asp-action="Delete" asp-route-id="@item.ThemeID"> |  Delete</a>
+
+
+
+                    }
                 </td>
             </tr>
     }

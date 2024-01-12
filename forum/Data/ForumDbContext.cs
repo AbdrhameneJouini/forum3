@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace forum.Models
 {
-    public class ForumDbContext : DbContext
+    public class ForumDbContext : IdentityDbContext<User>
     {
         public ForumDbContext(DbContextOptions<ForumDbContext> options) : base(options)
         {
@@ -37,9 +38,14 @@ namespace forum.Models
                 .HasForeignKey(p => p.ThemeId);
 
             modelBuilder.Entity<FollowedMessages>()
+                .HasKey(fm => new { fm.postId, fm.userId });
+
+            modelBuilder.Entity<FollowedMessages>()
                 .HasOne(f => f.Post)
                 .WithMany(p => p.FollowedMessages)
                 .HasForeignKey(f => f.postId);
+
+
 
             modelBuilder.Entity<FollowedMessages>()
                 .HasOne(f => f.User)
@@ -47,8 +53,7 @@ namespace forum.Models
                 .HasForeignKey(f => f.userId);
 
 
-            modelBuilder.Entity<FollowedMessages>()
-                .HasKey(fm => new { fm.postId, fm.userId });
+
 
             base.OnModelCreating(modelBuilder);
         }

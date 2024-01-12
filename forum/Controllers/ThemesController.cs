@@ -1,5 +1,7 @@
-﻿using forum.Models;
+﻿using System.Net.Mime;
+using forum.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -46,6 +48,7 @@ namespace forum.Controllers
         // GET: Themes/Create
         public IActionResult Create()
         {
+
             return View();
         }
 

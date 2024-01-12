@@ -7,7 +7,7 @@
 
         public int postId { get; set; }
         public Post Post { get; set; }
-        public int userId { get; set; }
+        public String userId { get; set; }
         public User User { get; set; }
     }
 }
