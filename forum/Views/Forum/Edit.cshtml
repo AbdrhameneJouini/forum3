@@ -1,4 +1,4 @@
-﻿@model forum.Models.Forum
+﻿@model forum.ViewModels.ForumViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -18,11 +18,14 @@
                 <input asp-for="Titre" class="form-control" />
                 <span asp-validation-for="Titre" class="text-danger"></span>
             </div>
+   
             <div class="form-group">
-                <label asp-for="DateCreation" class="control-label"></label>
-                <input asp-for="DateCreation" class="form-control" />
-                <span asp-validation-for="DateCreation" class="text-danger"></span>
+                <label asp-for="SelectedThemes" class="control-label">Forum Categories</label>
+                <select asp-for="SelectedThemes" class="form-control" asp-items="Model.ThemesList" multiple>
+                </select>
+                <span asp-validation-for="SelectedThemes" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>

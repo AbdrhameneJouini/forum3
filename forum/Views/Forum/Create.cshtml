@@ -1,59 +1,61 @@
-﻿@model forum.Models.Forum
-@using forum.ViewModels
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@using forum.Data.Enum
-@{
-    ViewData["Title"] = "Create";
-}
+﻿    @model forum.ViewModels.ForumViewModel
 
+    @using Microsoft.AspNetCore.Mvc.TagHelpers
+    @{
+        ViewData["Title"] = "Create";
+    }
 
-   
+    <h1>Create</h1>
 
-<h1>Create</h1>
+    <h4>Forum</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Titre" class="control-label"></label>
+                    <input asp-for="Titre" class="form-control" />
+                    <span asp-validation-for="Titre" class="text-danger"></span>
+                </div>
 
-<h4>Forum</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Titre" class="control-label"></label>
-                <input asp-for="Titre" class="form-control" />
-                <span asp-validation-for="Titre" class="text-danger"></span>
-            </div>
-            
-        
+                <div class="form-group">
+                    <label class="control-label">Forum Categories</label>
 
-            <div class="form-group">
-                <label class="control-label">Forum Categories</label>
+                    <select name="SelectedThemes" class="form-control selectpicker" multiple data-live-search="true">
+                        @foreach (var theme in Model.ThemesList)
+                        {
+                            <option value="@theme.Value">@theme.Text</option>
+                        }
+                    </select>
 
-                @foreach (var theme in Model.ThemesList)
-                {
-                    <div class="form-check">
-                        <input type="checkbox" name="SelectedThemes" value="@theme.Value" class="form-check-input" />
-                        <label class="form-check-label">@theme.Text</label>
-                    </div>
-                }
+                    <span asp-validation-for="SelectedThemes" class="text-danger"></span>
+          
+                </div>
 
-                <span asp-validation-for="Themes" class="text-danger"></span>
-            </div>
-
-            
-            
-
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-
-        </form>
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div>
+        <a asp-action="Index">Back to List</a>
+    </div>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/i18n/defaults-en_US.min.js"></script>
+
+        <script>
+            $(document).ready(function () {
+                $('.selectpicker').selectpicker();
+            });
+        </script>
+    }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using forum.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace forum.Controllers
@@ -19,10 +20,15 @@ namespace forum.Controllers
         // GET: Forum
         public async Task<IActionResult> Index()
         {
-              return _context.Forums != null ? 
-                          View(await _context.Forums.ToListAsync()) :
-                          Problem("Entity set 'ForumDbContext.Forums'  is null.");
+            var forumsWithThemes = await _context.Forums
+                .Include(f => f.Themes) 
+                .ThenInclude(t => t.Forums)
+                .ThenInclude(tf => tf.Themes) 
+                .ToListAsync();
+
+            return View(forumsWithThemes);
         }
+
 
         // GET: Forum/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -33,7 +39,9 @@ namespace forum.Controllers
             }
 
             var forum = await _context.Forums
+                .Include(f => f.Themes)
                 .FirstOrDefaultAsync(m => m.ForumID == id);
+
             if (forum == null)
             {
                 return NotFound();
@@ -45,36 +53,56 @@ namespace forum.Controllers
         // GET: Forum/Create
         public IActionResult Create()
         {
-
-            var model = new Forum
+            var model = new ForumViewModel
             {
-                Themes = _context.Themes
-                    .Select(t => new Theme { ThemeID = t.ThemeID, Titre = t.Titre })
+                ThemesList = _context.Themes
+                    .Select(t => new SelectListItem { Value = t.ThemeID.ToString(), Text = t.Titre })
                     .ToList()
             };
 
-
             return View(model);
-
-
         }
-     
+
 
         // POST: Forum/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ForumID,Titre,DateCreation")] Forum forum)
+        public async Task<IActionResult> Create([Bind("Titre,DateCreation,SelectedThemes")] ForumViewModel forumViewModel)
         {
+            forumViewModel.ThemesList = _context.Themes
+                .Select(t => new SelectListItem { Value = t.ThemeID.ToString(), Text = t.Titre })
+                .ToList();
+
             if (ModelState.IsValid)
             {
+                // Convert ForumViewModel to Forum entity
+                var forum = new Forum
+                {
+                    Titre = forumViewModel.Titre,
+                    DateCreation = DateTime.Now,
+                    Themes = _context.Themes
+                        .Where(t => forumViewModel.SelectedThemes.Contains(t.ThemeID.ToString()))
+                        .ToList()
+                };
+
+                // Add the forum and associated themes to the database
                 _context.Add(forum);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(forum);
+
+            // If ModelState is not valid, repopulate the ThemesList property
+            forumViewModel.ThemesList = _context.Themes
+                .Select(t => new SelectListItem { Value = t.ThemeID.ToString(), Text = t.Titre });
+
+            return View(forumViewModel);
         }
+
+
+
 
         // GET: Forum/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -84,31 +112,52 @@ namespace forum.Controllers
                 return NotFound();
             }
 
-            var forum = await _context.Forums.FindAsync(id);
+            var forum = await _context.Forums
+                .Include(f => f.Themes)
+                .FirstOrDefaultAsync(m => m.ForumID == id);
+
             if (forum == null)
             {
                 return NotFound();
             }
-            return View(forum);
+
+            var forumViewModel = new ForumViewModel
+            {
+                ForumID = forum.ForumID,
+                Titre = forum.Titre,
+                SelectedThemes = forum.Themes.Select(t => t.ThemeID.ToString()).ToList(),
+                ThemesList = _context.Themes
+                    .Select(t => new SelectListItem { Value = t.ThemeID.ToString(), Text = t.Titre })
+                    .ToList()
+            };
+
+            return View(forumViewModel);
         }
 
         // POST: Forum/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ForumID,Titre,DateCreation")] Forum forum)
+        public async Task<IActionResult> Edit(int id, [Bind("ForumID,Titre,SelectedThemes")] ForumViewModel forumViewModel)
         {
-            if (id != forum.ForumID)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
+                var forum = await _context.Forums
+                    .Include(f => f.Themes)
+                    .FirstOrDefaultAsync(m => m.ForumID == id);
+
+                if (forum == null)
+                {
+                    return NotFound();
+                }
+
+                forum.Titre = forumViewModel.Titre;
+
+                forum.Themes = _context.Themes
+                    .Where(t => forumViewModel.SelectedThemes.Contains(t.ThemeID.ToString()))
+                    .ToList();
+
                 try
                 {
-                    _context.Update(forum);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -122,10 +171,19 @@ namespace forum.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(forum);
+
+            forumViewModel.ThemesList = _context.Themes
+                .Select(t => new SelectListItem { Value = t.ThemeID.ToString(), Text = t.Titre })
+                .ToList();
+
+            return View(forumViewModel);
         }
+
+
+
 
         // GET: Forum/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -136,7 +194,9 @@ namespace forum.Controllers
             }
 
             var forum = await _context.Forums
+                .Include(f => f.Themes)
                 .FirstOrDefaultAsync(m => m.ForumID == id);
+
             if (forum == null)
             {
                 return NotFound();
@@ -152,15 +212,16 @@ namespace forum.Controllers
         {
             if (_context.Forums == null)
             {
-                return Problem("Entity set 'ForumDbContext.Forums'  is null.");
+                return Problem("Entity set 'ForumDbContext.Forums' is null.");
             }
+
             var forum = await _context.Forums.FindAsync(id);
             if (forum != null)
             {
                 _context.Forums.Remove(forum);
+                await _context.SaveChangesAsync();
             }
-            
-            await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
