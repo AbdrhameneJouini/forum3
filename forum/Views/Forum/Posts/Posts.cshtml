@@ -120,43 +120,45 @@
                     <div class="row align-items-center">
                         <div class="col-md-8 mb-3 mb-sm-0">
                             <h5>
-                                <a href="#" class="text-primary">@post.Title</a>
+                                <a asp-controller="Post" asp-action="Index" asp-route-id="@post.PostID" class="text-primary">@post.Title</a>
                             </h5>
                             <p class="text-sm">
-                                <span class="op-6">Posted</span>
-                                
-                                @{
-                                    var timeDifference = (DateTime.Now - (post.DateCreationLastMessage ?? DateTime.Now));
-                                    var minutesAgo = timeDifference.TotalMinutes;
-                                }
-                                <a class="text-black" href="#">  @(minutesAgo.ToString("F0")) minutes ago </a>
-                                
-                               
+                                <span class="op-6">Posted on @post.DateCreationMessage.ToString()</span>
+
+
+
+
 
                                 <span class="op-6">by</span>
                                 <a class="text-black" href="#">@post.CreatorUser.UserName</a>
                             </p>
-                            
-                            
+
+
                             <p class="text-sm" style="font-size: 12px">
                                 <span class="op-6">Updated</span>
-                                
+
                                 @{
                                     var timeDifferenceLastMessage = (DateTime.Now - (post.DateCreationLastMessage ?? DateTime.Now));
                                     var minutesAgoLastNessage = timeDifferenceLastMessage.TotalMinutes;
                                 }
                                 <a class="text-black" href="#">  @(minutesAgoLastNessage.ToString("F0")) minutes ago </a>
-                                
-                               
+
+
 
                                 <span class="op-6">by</span>
                                 <a class="text-black" href="#">@post.CreatorUser.UserName</a>
                             </p>
                             <div class="text-sm op-5">
-                                
-                                
-                                    <a class="text-black mr-2" href="#">#@post.MotCle</a>
-                                
+
+
+                                <a class="text-black mr-2" href="#">@post.Message</a>
+
+                            </div>
+                            <div class="text-sm op-5">
+
+
+                                <a class="text-black mr-2" href="#">#@post.MotCle</a>
+
                             </div>
                         </div>
                         <div class="col-md-4 op-7">
