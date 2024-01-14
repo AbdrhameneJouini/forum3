@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using forum.Models;
 
@@ -11,9 +12,11 @@ using forum.Models;
 namespace forum.Migrations
 {
     [DbContext(typeof(ForumDbContext))]
-    partial class ForumDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240113162955_changes")]
+    partial class changes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -249,14 +252,13 @@ namespace forum.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PostID"));
 
-                    b.Property<DateTime?>("DateCreationLastMessage")
+                    b.Property<DateTime>("DateCreationMessage")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DateCreationMessage")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("FilID")
+                        .HasColumnType("int");
 
-                    b.Property<int?>("ForumId")
-                        .IsRequired()
+                    b.Property<int>("ForumId")
                         .HasColumnType("int");
 
                     b.Property<string>("Message")
@@ -264,20 +266,14 @@ namespace forum.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MotCle")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Sujet")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("ThemeId")
+                    b.Property<int>("ThemeId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("userID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PostID");
 
@@ -509,11 +505,15 @@ namespace forum.Migrations
                 {
                     b.HasOne("forum.Models.Forum", "Forum")
                         .WithMany("Posts")
-                        .HasForeignKey("ThemeId");
+                        .HasForeignKey("ThemeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("forum.Models.Theme", "Theme")
                         .WithMany("Posts")
-                        .HasForeignKey("ThemeId");
+                        .HasForeignKey("ThemeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Forum");
 

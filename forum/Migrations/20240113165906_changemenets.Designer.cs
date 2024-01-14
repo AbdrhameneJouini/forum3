@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using forum.Models;
 
@@ -11,9 +12,11 @@ using forum.Models;
 namespace forum.Migrations
 {
     [DbContext(typeof(ForumDbContext))]
-    partial class ForumDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240113165906_changemenets")]
+    partial class changemenets
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -255,8 +258,10 @@ namespace forum.Migrations
                     b.Property<DateTime?>("DateCreationMessage")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ForumId")
-                        .IsRequired()
+                    b.Property<int?>("FilID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ForumId")
                         .HasColumnType("int");
 
                     b.Property<string>("Message")
@@ -264,6 +269,7 @@ namespace forum.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MotCle")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Sujet")
@@ -271,13 +277,6 @@ namespace forum.Migrations
 
                     b.Property<int?>("ThemeId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("userID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PostID");
 

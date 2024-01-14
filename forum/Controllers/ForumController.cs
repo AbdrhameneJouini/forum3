@@ -229,5 +229,59 @@ namespace forum.Controllers
         {
           return (_context.Forums?.Any(e => e.ForumID == id)).GetValueOrDefault();
         }
+
+
+
+
+
+        // Add this method to your ForumController
+        // GET: Forum/Posts/5
+        public async Task<IActionResult> Posts(int? id)
+        {
+            if (id == null || _context.Forums == null)
+            {
+                return NotFound();
+            }
+
+            var forum = await _context.Forums
+                .Include(f => f.Posts)
+                .ThenInclude(p => p.Theme) // Include theme for each post
+                .FirstOrDefaultAsync(m => m.ForumID == id);
+
+            if (forum == null)
+            {
+                return NotFound();
+            }
+
+    
+
+
+           
+            var sujetPosts = _context.Posts
+                .Where(p => p.Sujet && p.ForumId == id)
+                .OrderByDescending(p => p.DateCreationLastMessage)
+                .ToList();
+
+            foreach (var post in sujetPosts)
+            {
+                var user = _context.Users.FirstOrDefault(u => u.Id == post.userID);
+
+                post.CreatorUser = user;
+            }
+
+            var viewModel = new ForumPostsViewModel
+            {
+                ForumId = forum.ForumID,
+                ForumTitle = forum.Titre,
+                Posts = sujetPosts,
+             
+            };
+
+            return View("Posts/Posts", viewModel);
+        }
+
+            
+        
+
     }
 }

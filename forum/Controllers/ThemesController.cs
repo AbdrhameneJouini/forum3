@@ -36,7 +36,10 @@ namespace forum.Controllers
             }
 
             var theme = await _context.Themes
+                .Include(t => t.Forums)  
+                .ThenInclude(tf => tf.Themes)  
                 .FirstOrDefaultAsync(m => m.ThemeID == id);
+
             if (theme == null)
             {
                 return NotFound();

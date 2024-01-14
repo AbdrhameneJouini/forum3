@@ -14,7 +14,10 @@ using System.ComponentModel.DataAnnotations.Schema;
         public DateTime DateCreation { get; set; }
         public ICollection<Theme> Themes { get;  set; }
 
-        [NotMapped]
+        public ICollection<Post> Posts { get; set; }
+
+
+    [NotMapped]
         public IEnumerable<SelectListItem> ThemesList
         {
             get

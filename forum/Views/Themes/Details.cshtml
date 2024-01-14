@@ -17,7 +17,27 @@
             @Html.DisplayFor(model => model.Titre)
         </dd>
     </dl>
+    
+    
+    <div>
+        <h4>Forums with this Theme</h4>
+        <ul>
+            @foreach (var forum in Model.Forums)
+            {
+                <dl class="row">
+                    <dt class="col-sm-2">
+                        Forum
+                    </dt>
+                    <dd class="col-sm-10">
+                        @forum.Titre
+                    </dd>
+                </dl>
+            }
+        </ul>
+    </div>
 </div>
+
+
 <div>
     
     @if (User.IsInRole("admin"))

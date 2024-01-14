@@ -4,13 +4,13 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Forums List</h1>
 @if (User.IsInRole("admin"))
 {
 
 
     <p>
-        <a asp-action="Create">Create New</a>
+        <a asp-action="Create">Create New Forum</a>
     </p>
 }
 
@@ -34,7 +34,9 @@
     {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Titre)
+                
+                    <a asp-action="Posts" asp-route-id="@item.ForumID">     @Html.DisplayFor(modelItem => item.Titre) </a>
+           
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.DateCreation)
@@ -53,7 +55,7 @@
                 }
             </td>
             <td>
-                @if (User.IsInRole("admin"))
+                @if (User.IsInRole("admin"))    
                 {
 
                     <a asp-action="Edit" asp-route-id="@item.ForumID">Edit |</a>
