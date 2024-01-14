@@ -37,6 +37,14 @@ namespace forum.Models
                 .WithMany(t => t.Posts)
                 .HasForeignKey(p => p.ThemeId);
 
+
+
+
+            modelBuilder.Entity<Post>()
+                .HasOne(p => p.Forum)
+                .WithMany(t => t.Posts)
+                .HasForeignKey(p => p.ThemeId);
+
             modelBuilder.Entity<FollowedMessages>()
                 .HasKey(fm => new { fm.postId, fm.userId });
 

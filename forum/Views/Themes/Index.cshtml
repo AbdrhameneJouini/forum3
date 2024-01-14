@@ -4,13 +4,13 @@
         ViewData["Title"] = "Index";
     }
 
-    <h1>Index</h1>
+    <h1>Themes List</h1>
     
     
     @if (User.IsInRole("admin"))
     {
         <p>
-            <a asp-action="Create">Create New</a>
+            <a asp-action="Create">Create New Theme</a>
         </p>
 
     }
