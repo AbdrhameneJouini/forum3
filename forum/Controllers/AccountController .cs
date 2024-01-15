@@ -45,6 +45,11 @@ namespace forum.Controllers
        
             if (user != null)
             {
+                if (user.Valide == false)
+                {
+                    TempData["Error"] = "User is not yet validated by moderators. Please try again later ";
+                    return View(loginViewModel);
+                }
               
                 // User is found check password
                 var passwordCheck = await _userManager.CheckPasswordAsync(user, loginViewModel.Password);
@@ -109,7 +114,8 @@ namespace forum.Controllers
             {
                 Email = registerViewModel.Email,
                 UserName = registerViewModel.UserName,
-                CheminAvatar = "/uploads/Default_Avatar.jpg"
+                CheminAvatar = "/uploads/Default_Avatar.jpg",
+                Valide = false
             };
             var newUserResponse = await _userManager.CreateAsync(newUser, registerViewModel.Password);
 

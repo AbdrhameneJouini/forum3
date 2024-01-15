@@ -1,0 +1,59 @@
+﻿@model forum.ViewModels.UserViewModel;
+
+
+
+
+
+
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>
+            username
+        </th>
+        <th>
+            email
+        </th>
+        <th>
+            signature
+        </th>
+        <th>
+            valide
+        </th>
+        <th>
+            chemin avatar
+        </th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.users) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Signature)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Valide)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CheminAvatar)
+            </td>
+                <td>
+                    @if ( item.Valide == false )
+                    {
+                        <a asp-controller="User" asp-action="Validate" asp-route-id="@item.Id"> Validate   </a>
+
+
+                    }
+                </td>
+        </tr>
+    }
+    </tbody>
+</table>

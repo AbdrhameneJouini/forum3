@@ -9,22 +9,8 @@
 <p>@ViewData["DbConnectionTest"]</p>
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
+    <h1 class="display-4">Followed posts</h1>
 </div>
-
-@if (User.IsInRole("user"))
-{
-    <div class="navbar-nav">
-        <h1> YOU ARE A USER </h1>
-    </div>
-}
-
-@if (User.IsInRole("admin"))
-{
-    <div class="navbar-nav">
-        <h1>YOU ARE AN ADMIN</h1>
-    </div>
-}
 
 
 
