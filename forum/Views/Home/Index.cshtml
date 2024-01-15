@@ -1,9 +1,9 @@
-﻿@model List<Post>;
+﻿@model forum.ViewModels.HomeViewModel;
 
 @{
     ViewData["Title"] = "Home Page";
 }
-@using forum.Data
+
 <h2>@ViewData["Message"]</h2>
 
 <p>@ViewData["DbConnectionTest"]</p>
@@ -12,43 +12,26 @@
     <h1 class="display-4">Welcome</h1>
 </div>
 
-@{
-    DatabaseConnector dbConnector = new DatabaseConnector();
-    bool isConnected = dbConnector.TestConnection();
-}
 
-@if (isConnected)
-{
-    <p style="color: green;">Database connection successful!</p>
-}
-else
-{
-    <p style="color: red;">Failed to connect to the database.</p>
-}
-
-
-@if (User.IsInRole("user"))
-{
     <div class="navbar-nav">
-        <h1> YOU ARE A USER </h1>
+       
+       
+        <form class="form-inline d-flex justify-content-center md-form form-sm mt-0"  method="post"  asp-controller="Home" asp-action="Search"   >
+          
+            <input class="form-control form-control-sm ml-3 w-75" type="text" placeholder="Search" name="search" id="search"
+                   aria-label="Search" />
+          
+                 
+         
+        </form>
+        <br /> <br />
+        <h1> ACTIVE TOPICS</h1>
     </div>
-}
-
-
-@if (User.IsInRole("admin"))
-{
-    <div class="navbar-nav">
-        <h1>YOU ARE AN ADMIN</h1>
-    </div>
-}
-
-
-
 
 
 
 <style>
-    
+
     body {
         margin-top: 20px;
         background: #eee;
@@ -79,67 +62,217 @@ else
 
 <link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet">
 
+<div class="container">
 
-@foreach (var post in Model)    
-{
-    <div class="card row-hover pos-relative py-3 px-3 mb-3 border-warning border-top-0 border-right-0 border-bottom-0 rounded-0">
-        <div class="row align-items-center">
-            <div class="col-md-8 mb-3 mb-sm-0">
-                <img alt="Avatar" class="rounded-circle mt-5" width="35px" src="@post?.CreatorUser.CheminAvatar" />
-                <h5>
-                    <a asp-controller="Post" asp-action="Index" asp-route-id="@post.PostID" class="text-primary">@post.Title</a>
-                </h5>
-                <p class="text-sm">
-                    <span class="op-6">Posted on @post.DateCreationMessage.ToString()</span>
+    <div class="row">
+        <div class="col-md-8">
+            @if (   (Model?.searchInput == null || Model?.searchInput == "" ) && Model?.posts != null   )
+            {
 
+                @Model.searchInput
 
+                @foreach (var post in Model?.posts)
+                {
 
+                    <div class="card row-hover pos-relative py-3 px-3 mb-3 border-warning border-top-0 border-right-0 border-bottom-0 rounded-0">
+                        <div class="row align-items-center">
+                            <div class="col-md-8 mb-3 mb-sm-0">
 
-
-                    <span class="op-6">by</span>
-                    <a class="text-black" href="#">@post.CreatorUser.UserName</a>
-                </p>
-
-
-                <p class="text-sm" style="font-size: 12px">
-                    <span class="op-6">Updated</span>
-
-                    @{
-                        var timeDifferenceLastMessage = (DateTime.Now - (post.DateCreationLastMessage ?? DateTime.Now));
-                        var minutesAgoLastNessage = timeDifferenceLastMessage.TotalMinutes;
-                    }
-                    <a class="text-black" href="#"> @(minutesAgoLastNessage.ToString("F0")) minutes ago </a>
+                                <img alt="Avatar" class="rounded-circle mt-5" width="35px" src="@post?.CreatorUser.CheminAvatar" />
+                                <h5>
+                                    @post.CreatorUser.UserName :
+                                    <a asp-controller="Post" asp-action="Index" asp-route-id="@post.PostID" class="text-primary">@post.Title</a>
+                                </h5>
+                                <p class="text-sm">
+                                    <span class="op-6">Posted on @post.DateCreationMessage.ToString()</span>
+                                    <span class="op-6">by</span>
+                                    <a class="text-black" href="#">@post.CreatorUser.UserName</a>
+                                </p>
 
 
+                                <p class="text-sm" style="font-size: 12px">
+                                    <span class="op-6">Updated</span>
+                                    @{
+                                        var timeDifferenceLastMessage = (DateTime.Now - (post.DateCreationLastMessage ?? DateTime.Now));
+                                        var minutesAgoLastNessage = timeDifferenceLastMessage.TotalMinutes;
+                                    }
+                                    <a class="text-black" href="#"> @(minutesAgoLastNessage.ToString("F0")) minutes ago </a>
+                                    <span class="op-6">by</span>
+                                    <a class="text-black" href="#">@post.CreatorUser.UserName</a>
+                                </p>
+                                <div class="text-sm op-5">
+                                    <a class="text-black mr-2" href="#">@post.Message</a>
+                                </div>
+                                <div class="text-sm op-5">
+                                    <a class="text-black mr-2" href="#">#@post.MotCle</a>
+                                </div>
+                            </div>
 
-                    <span class="op-6">by</span>
-                    <a class="text-black" href="#">@post.CreatorUser.UserName</a>
-                </p>
-                <div class="text-sm op-5">
+                            <div class="col-md-4 op-7">
+                                <div class="row text-center op-7">
+                                    @if (post.isInFavorite)
+                                    {
+                                        <a asp-controller="Post" asp-action="ToggleFavoriteStatus" asp-route-postId="@post.PostID">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314" />
+                                            </svg>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="Post" asp-action="ToggleFavoriteStatus" asp-route-postId="@post.PostID">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                                                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.920 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15" />
+                                            </svg>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
 
 
-                    <a class="text-black mr-2" href="#">@post.Message</a>
-
-                </div>
-                <div class="text-sm op-5">
 
 
-                    <a class="text-black mr-2" href="#">#@post.MotCle</a>
 
-                </div>
-            </div>
-            <div class="col-md-4 op-7">
-                <div class="row text-center op-7">
-                    <div class="col px-1"> <i class="ion-connection-bars icon-1x"></i> <span class="d-block text-sm"> Votes</span> </div>
-                    <div class="col px-1"> <i class="ion-ios-chatboxes-outline icon-1x"></i> <span class="d-block text-sm"> Replies</span> </div>
-                    <div class="col px-1"> <i class="ion-ios-eye-outline icon-1x"></i> <span class="d-block text-sm"> Views</span> </div>
-                </div>
-            </div>
+
+
+            }
+            else
+            {
+
+                if (Model?.SearchPosts?.Count == 0)
+                {
+                    <h1> NO RESULTS FOUND</h1>
+                }
+
+
+                @foreach (var post in Model?.SearchPosts)
+                {
+
+                    <div class="card row-hover pos-relative py-3 px-3 mb-3 border-warning border-top-0 border-right-0 border-bottom-0 rounded-0">
+                        <div class="row align-items-center">
+                            <div class="col-md-8 mb-3 mb-sm-0">
+
+                                <img alt="Avatar" class="rounded-circle mt-5" width="35px" src="@post?.CreatorUser.CheminAvatar" />
+                                <h5>
+                                    @post.CreatorUser.UserName :
+                                    <a asp-controller="Post" asp-action="Index" asp-route-id="@post.PostID" class="text-primary">@post.Title</a>
+                                </h5>
+                                <p class="text-sm">
+                                    <span class="op-6">Posted on @post.DateCreationMessage.ToString()</span>
+                                    <span class="op-6">by</span>
+                                    <a class="text-black" href="#">@post.CreatorUser.UserName</a>
+                                </p>
+
+
+                                <p class="text-sm" style="font-size: 12px">
+                                    <span class="op-6">Updated</span>
+                                    @{
+                                        var timeDifferenceLastMessage = (DateTime.Now - (post.DateCreationLastMessage ?? DateTime.Now));
+                                        var minutesAgoLastNessage = timeDifferenceLastMessage.TotalMinutes;
+                                    }
+                                    <a class="text-black" href="#"> @(minutesAgoLastNessage.ToString("F0")) minutes ago </a>
+                                    <span class="op-6">by</span>
+                                    <a class="text-black" href="#">@post.CreatorUser.UserName</a>
+                                </p>
+                                <div class="text-sm op-5">
+                                    <a class="text-black mr-2" href="#">@post.Message</a>
+                                </div>
+                                <div class="text-sm op-5">
+                                    <a class="text-black mr-2" href="#">#@post.MotCle</a>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 op-7">
+                                <div class="row text-center op-7">
+                                    @if (post.isInFavorite)
+                                    {
+                                        <a asp-controller="Post" asp-action="ToggleFavoriteStatus" asp-route-postId="@post.PostID">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                                                <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314" />
+                                            </svg>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="Post" asp-action="ToggleFavoriteStatus" asp-route-postId="@post.PostID">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                                                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.920 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15" />
+                                            </svg>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            }
+          
         </div>
+        @if (User.Identity.IsAuthenticated)
+        {
+
+
+            <div class="col-lg-3 mb-4 mb-lg-0 px-lg-0 mt-lg-0">
+                <div style="visibility: hidden; display: none; width: 285px; height: 801px; margin: 0px; float: none; position: static; inset: 85px auto auto;"></div>
+                <div data-settings="{&quot;parent&quot;:&quot;#content&quot;,&quot;mind&quot;:&quot;#header&quot;,&quot;top&quot;:10,&quot;breakpoint&quot;:992}" data-toggle="sticky" class="sticky" style="top: 85px;">
+                    <div class="sticky-inner">
+
+                        <div class="bg-white mb-3">
+                            <h4 class="px-3 py-4 op-5 m-0">
+                                unseen messages
+                            </h4>
+                            <hr class="m-0">
+
+                            @foreach (var message in Model.followedMessages)
+                            {
+
+                                <div class="pos-relative px-3 py-3">
+                                    <h6 class="text-primary text-sm">
+                                        <a asp-controller="Post" asp-action="Index" asp-route-id="@message.Post.ReferencedPosts?.FirstOrDefault()?.PostID" class="text-primary"> @message.Post.Title </a>
+                                    </h6>
+
+                                    <span> @message.Post.Message</span>
+                                    <p class="mb-0 text-sm"><span class="op-6">Posted</span> at @message.CreatioDateTime by <a class="text-black" href="#">@message.User.UserName</a>
+
+                                        <a style="cursor:pointer" asp-controller="FollowedMessages" asp-action="Archive"
+
+                                           asp-route-userId=@message.userId
+                                           asp-route-postId=@message.postId
+                                           asp-route-creationDate="@message.CreatioDateTime">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                                <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425z"/>
+                                            </svg>
+
+                                        </a>
+                                    </p>
+
+                                </div>
+
+                                <hr class="m-0">
+
+
+
+
+                            }
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        }
+
+
     </div>
-}
 
 
-                    
-                
-                
+
+</div>

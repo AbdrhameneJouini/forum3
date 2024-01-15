@@ -22,6 +22,15 @@ namespace forum.Models
                     .WithMany(p => p.Users)
                     .UsingEntity(j => j.ToTable("UsersPosts"));
 
+
+                modelBuilder.Entity<User>()
+                    .HasMany(u => u.AbonnePosts)
+                    .WithMany(p => p.AbonneUsers)
+                    .UsingEntity(j => j.ToTable("AbonneUsersPosts"));
+
+
+
+
             modelBuilder.Entity<Theme>()
                 .HasMany(t => t.Forums)
                 .WithMany(f => f.Themes)
@@ -46,7 +55,7 @@ namespace forum.Models
                 .HasForeignKey(p => p.ThemeId);
 
             modelBuilder.Entity<FollowedMessages>()
-                .HasKey(fm => new { fm.postId, fm.userId });
+                .HasKey(fm => new { fm.postId, fm.userId, fm.CreatioDateTime });
 
             modelBuilder.Entity<FollowedMessages>()
                 .HasOne(f => f.Post)

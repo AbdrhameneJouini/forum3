@@ -26,6 +26,11 @@ namespace forum.Models
         public ICollection<Post>? ReferencedPosts { get; set; }
 
         public ICollection<User>? Users { get; set; }
+
+        public ICollection<User>? AbonneUsers { get; set; }
+
+
+
         public int? ThemeId { get; set; }
         public Theme? Theme { get; set; }
 
@@ -39,5 +44,25 @@ namespace forum.Models
 
         [NotMapped]
         public User CreatorUser { get; set; }
+
+
+        [NotMapped]
+        public bool isInFavorite { get; set; }
+
+        public void AddReply(Post motherPost)
+        {
+            if (ReferencedPosts == null)
+            {
+                ReferencedPosts = new List<Post>();
+            }
+
+            ReferencedPosts.Add(motherPost);
+            if (motherPost.ReferencingPosts == null)
+            {
+                motherPost.ReferencingPosts = new List<Post>();
+            }
+            
+            motherPost.ReferencingPosts.Add(this);
+        }
     }
 }

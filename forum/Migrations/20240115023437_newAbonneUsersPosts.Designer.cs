@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using forum.Models;
 
@@ -11,9 +12,11 @@ using forum.Models;
 namespace forum.Migrations
 {
     [DbContext(typeof(ForumDbContext))]
-    partial class ForumDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240115023437_newAbonneUsersPosts")]
+    partial class newAbonneUsersPosts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -223,16 +226,13 @@ namespace forum.Migrations
                     b.Property<string>("userId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("CreatioDateTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<bool>("Archive")
                         .HasColumnType("bit");
 
                     b.Property<bool>("Lu")
                         .HasColumnType("bit");
 
-                    b.HasKey("postId", "userId", "CreatioDateTime");
+                    b.HasKey("postId", "userId");
 
                     b.HasIndex("userId");
 

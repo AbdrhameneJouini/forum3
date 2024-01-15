@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using forum.ViewModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace forum.Controllers
@@ -11,10 +12,12 @@ namespace forum.Controllers
     public class ForumController : Controller
     {
         private readonly ForumDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public ForumController(ForumDbContext context)
+        public ForumController(ForumDbContext context,UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Forum
@@ -253,11 +256,12 @@ namespace forum.Controllers
                 return NotFound();
             }
 
-    
+
+            var loggedUserId = _userManager.GetUserId(HttpContext.User);
 
 
-           
             var sujetPosts = _context.Posts
+                .Include(p => p.AbonneUsers)
                 .Where(p => p.Sujet && p.ForumId == id)
                 .OrderByDescending(p => p.DateCreationLastMessage)
                 .ToList();
@@ -267,6 +271,19 @@ namespace forum.Controllers
                 var user = _context.Users.FirstOrDefault(u => u.Id == post.userID);
 
                 post.CreatorUser = user;
+
+                // Check if the logged-in user is in AbonneUsers for this post
+                if (post.AbonneUsers != null)
+                {
+                    post.isInFavorite = post.AbonneUsers.Any(u => u.Id == loggedUserId);
+
+                }
+                else
+                {
+                    post.isInFavorite = false;
+
+
+                }
             }
 
             var viewModel = new ForumPostsViewModel

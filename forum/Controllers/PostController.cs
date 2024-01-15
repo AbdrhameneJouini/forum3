@@ -26,6 +26,7 @@ namespace forum.Controllers
             var post = _context.Posts
                 .Include(p => p.Users)
                 .Include(p => p.ReferencedPosts)
+                .Include(p => p.AbonneUsers)
                 .FirstOrDefault(p => p.Sujet && p.PostID == id);
 
             if (post != null)
@@ -166,27 +167,51 @@ namespace forum.Controllers
                     DateCreationMessage = DateTime.Now,
                     DateCreationLastMessage = DateTime.Now,
                     Sujet = false,
+                    Title = post.Title,
                     ForumId = post.ForumId,
                     userID = userId
                 };
+                replyPost.AddReply(post);
 
-                if (post.ReferencedPosts == null)
+
+                //if (post.ReferencedPosts == null)
+                //{
+                //    post.ReferencedPosts = new List<Post>();
+                //}
+
+                //post.ReferencedPosts.Add(replyPost);
+
+                // Notify all users in the post except the user who created the reply
+                foreach (var userInPost in post.Users)
                 {
-                    post.ReferencedPosts = new List<Post>();
+                    if (userInPost.Id != userId) // Exclude the current user
+                    {
+                        var followedMessage = new FollowedMessages
+                        {
+                            Lu = false,
+                            Archive = false,
+                            postId = replyPost.PostID,
+                            Post = replyPost,
+                            userId = userInPost.Id,
+                            User = userInPost,
+                            CreatioDateTime = DateTime.Now
+                        };
+
+                        _context.FollowedMessages.Add(followedMessage);
+                    }
                 }
-                post.ReferencedPosts.Add(replyPost);
 
                 post.DateCreationLastMessage = DateTime.Now;
 
                 await _context.SaveChangesAsync();
-
-              
 
                 return RedirectToAction(nameof(Index), new { id = post.PostID });
             }
 
             return NotFound();
         }
+
+
 
 
         [HttpPost]
@@ -239,10 +264,78 @@ namespace forum.Controllers
 
 
 
+        [HttpGet]
+        public async Task<IActionResult> ToggleFavoriteStatus(int postId)
+        {
+            var loggedUserId = _userManager.GetUserId(HttpContext.User);
+
+            var post = _context.Posts
+                .Include(p => p.AbonneUsers)
+                .FirstOrDefault(p => p.PostID == postId);
+
+            if (post != null)
+            {
+                var isInFavorite = post.AbonneUsers.Any(u => u.Id == loggedUserId);
+
+                if (isInFavorite)
+                {
+                    // Remove the logged-in user from AbonneUsers
+                    var userToRemove = post.AbonneUsers.FirstOrDefault(u => u.Id == loggedUserId);
+                    post.AbonneUsers.Remove(userToRemove);
+                }
+                else
+                {
+                    // Add the logged-in user to AbonneUsers
+                    var loggedUser = _context.Users.FirstOrDefault(u => u.Id == loggedUserId);
+                    post.AbonneUsers.Add(loggedUser);
+                }
+
+                await _context.SaveChangesAsync();
+
+                // Redirect to the "Index" action of the "Home" controller
+                return RedirectToAction("Index", "Home");
+            }
+
+            // Handle the case where the post is not found
+            return NotFound();
+        }
 
 
+        public IActionResult Followed()
+        {
+            // Get the ID of the logged-in user
+            var loggedUserId = _userManager.GetUserId(HttpContext.User);
+
+            // Retrieve the user's abonne posts
+            var abonnePosts = _context.Posts
+                .Include(p => p.AbonneUsers)
+                .Where(p => p.AbonneUsers.Any(u => u.Id == loggedUserId))
+                .ToList();
+
+            foreach (var post in abonnePosts)
+            {
+                // Search for the user associated with the post
+                var user = _context.Users.FirstOrDefault(u => u.Id == post.userID);
+
+                // Assign the user to the CreatorUser property
+                post.CreatorUser = user;
+
+                // Check if the logged-in user is in AbonneUsers for this post
+                if (post.AbonneUsers != null)
+                {
+                    post.isInFavorite = post.AbonneUsers.Any(u => u.Id == loggedUserId);
+
+                }
+                else
+                {
+                    post.isInFavorite = false;
 
 
+                }
+            }
+
+            return View(abonnePosts);
+        }
 
     }
 }

@@ -33,20 +33,35 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Forum" asp-action="Index">Forums</a>
                         </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Post" asp-action="Followed">Followed posts</a>
+                            </li>
+
+                        }
+                    
                     </ul>
-
+                  
                       
-
+                  
                     @if (!User.Identity.IsAuthenticated)
                     {
                         <div class="navbar-nav">
+                         
                             <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
                             <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Sign Up</a>
                         </div>
                     }
                     else
                     {
+                      
+
                         <div class="navbar-nav">
+                           
+                       
+                        
                             <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Profile">Profile</a>
                             <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
                         </div>

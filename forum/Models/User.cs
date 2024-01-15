@@ -19,8 +19,11 @@ public class User : IdentityUser
     public bool? Admin { get; set; } = false;
 
 
+
     public ICollection<FollowedMessages> FollowedMessages { get; set; }
     public ICollection<Post> Posts { get; set; }
+
+    public ICollection<Post> AbonnePosts { get; set; }
     public User()
     {
     }

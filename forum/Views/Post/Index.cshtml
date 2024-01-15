@@ -267,11 +267,11 @@
         <div class="post">
             <div class="post-header">
                 <img alt="Avatar" src="@Model?.MainPost.CreatorUser.CheminAvatar" />
-             
+                
                 <div class="post-author">
-                   
+                    @Model?.MainPost.CreatorUser.UserName
                 </div>
-                chemin is @Model?.MainPost.CreatorUser.CheminAvatar
+         
             </div>
             <div class="post-content">
                 @Model?.MainPost.Message
@@ -281,11 +281,28 @@
                     Posted on @Model?.MainPost.DateCreationMessage.ToString();
 
                 </div>
+              
                 <div class="post-actions">
-                @if ( Model.CanEditMainPost || User.IsInRole("admin") )
+                    @if (Model.MainPost.isInFavorite)
+                    {
+                        <a asp-controller="Post" asp-action="ToggleFavoriteStatus" asp-route-postId="@Model.MainPost.PostID">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314" />
+                            </svg>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Post" asp-action="ToggleFavoriteStatus" asp-route-postId="@Model.MainPost.PostID">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15" />
+                            </svg>
+                        </a>
+                    }
+                    @if (Model.CanEditMainPost || User.IsInRole("admin"))
                     {
                         <a href="#" class="edit-link">Edit</a>
-                        <a href="#" class="delete-link" >Delete</a>
+                        <a href="#" class="delete-link">Delete</a>
                     }
                     @*    <a href="#">
                         Reply
@@ -348,26 +365,31 @@
         @*  SHOW REPLIES *@
         
         
-        
-
-        <div class="reply-form">
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="reply-form">
                 <h3>
                     Leave a Reply
                 </h3>
-        <form id="replyForm" asp-controller="Post" asp-action="reply" asp-route-id="@Model?.MainPost.PostID">
+                <form id="replyForm" asp-controller="Post" asp-action="reply" asp-route-id="@Model?.MainPost.PostID">
                  
-            <div class="form-group">
-                <label for="message">
-                    Message:
-                </label>
-                <textarea class="form-control" id="message" name="message" placeholder="Enter your message" required="true"></textarea>
-            </div>
+                    <div class="form-group">
+                        <label for="message">
+                            Message:
+                        </label>
+                        <textarea class="form-control" id="message" name="message" placeholder="Enter your message" required="true"></textarea>
+                    </div>
                     <button class="submit-btn" type="submit">
                         Submit
                     </button>
                 </form>
             </div>
         
+
+
+        }
+
+  
         </div>
         <!-- Add more posts here -->
  
