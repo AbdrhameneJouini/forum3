@@ -8,6 +8,12 @@ namespace forum.ViewModels
         public Post MainPost { get; set; }
         public List<Post> Replies { get; set; }
 
-      
+
+        public Dictionary<int, bool> CanEditReplies { get; set; }
+
+        public  bool CanEditMainPost { get; set; }
+
+
+
     }
 }

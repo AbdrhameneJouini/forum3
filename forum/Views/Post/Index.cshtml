@@ -266,10 +266,12 @@
         </h1>
         <div class="post">
             <div class="post-header">
-                <img alt="Avatar" src="avatar1.jpg" />
+                <img alt="Avatar" src="@Model?.MainPost.CreatorUser.CheminAvatar" />
+             
                 <div class="post-author">
-                @Model?.MainPost.CreatorUser.UserName
+                   
                 </div>
+                chemin is @Model?.MainPost.CreatorUser.CheminAvatar
             </div>
             <div class="post-content">
                 @Model?.MainPost.Message
@@ -280,7 +282,12 @@
 
                 </div>
                 <div class="post-actions">
-                    <a href="#">
+                @if ( Model.CanEditMainPost || User.IsInRole("admin") )
+                    {
+                        <a href="#" class="edit-link">Edit</a>
+                        <a href="#" class="delete-link" >Delete</a>
+                    }
+                    @*    <a href="#">
                         Reply
                     </a>
                     <a href="#">
@@ -288,7 +295,7 @@
                     </a>
                     <a href="#">
                         Report
-                    </a>
+                    </a> *@
                 </div>
             </div>
         </div>
@@ -300,28 +307,29 @@
         
         
        
-      @foreach (var reply in Model?.Replies)
+        @foreach (var reply in Model?.Replies)
         {
-
-
-
-            <div class="post">
+            <div class="post" data-post-id="@reply.PostID">
                 <div class="post-header">
-                    <img alt="Avatar" src="avatar2.jpg"/>
+                    <img alt="Avatar" src="@reply?.CreatorUser.CheminAvatar" />
                     <div class="post-author">
                         Posted by: @(reply?.CreatorUser?.UserName ?? "Unknown User")
-
                     </div>
                 </div>
                 <div class="post-content">
                     @reply?.Message
-                    </div>
+                </div>
                 <div class="post-footer">
                     <div class="post-date">
-                    Posted on @reply?.DateCreationMessage.ToString();
+                        Posted on @reply?.DateCreationMessage.ToString();
                     </div>
                     <div class="post-actions">
-                        <a href="#">
+                    @if ((Model.CanEditReplies.ContainsKey(reply.PostID) && Model.CanEditReplies[reply.PostID]) || (User.IsInRole("admin")))
+                        {
+                            <a href="#" class="edit-link">Edit</a>
+                            <a href="#" class="delete-link" >Delete</a>
+                        }
+                    @*     <a href="#">
                             Reply
                         </a>
                         <a href="#">
@@ -329,12 +337,14 @@
                         </a>
                         <a href="#">
                             Report
-                        </a>
+                        </a> *@
                     </div>
                 </div>
             </div>
-
         }
+
+
+        
         @*  SHOW REPLIES *@
         
         
@@ -367,3 +377,80 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js">
     </script>
 
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Attach click event to the "Edit" links
+            $(".edit-link").on("click", function (e) {
+                e.preventDefault();
+
+                // Find the corresponding post container
+                var postContainer = $(this).closest(".post");
+
+                // Get the post ID
+                var postId = postContainer.data("post-id");
+
+                // Find the post content element
+                var postContent = postContainer.find(".post-content");
+
+                // Get the current post content
+                var currentContent = postContent.text().trim();
+
+                // Replace the post content with a textarea for editing
+                postContent.html('<textarea class="form-control">' + currentContent + '</textarea>');
+
+                // Append "Save" and "Cancel" buttons
+                postContent.append('<button class="btn btn-primary save-button">Save</button>');
+                postContent.append('<button class="btn btn-secondary cancel-button">Cancel</button>');
+
+                // Attach click event to the "Save" button
+                postContent.find(".save-button").on("click", function () {
+                    // Get the edited content
+                    var editedContent = postContent.find("textarea").val();
+
+                    // Perform AJAX request to update the post content
+                    $.ajax({
+                        url: "/Post/UpdatePost", // Change the URL to your actual update action
+                        type: "POST",
+                        data: { postId: postId, editedContent: editedContent },
+                        success: function () {
+                            // Update the post content with the edited content
+                            postContent.html(editedContent);
+                        }
+                    });
+                });
+
+                // Attach click event to the "Cancel" button
+                postContent.find(".cancel-button").on("click", function () {
+                    // Restore the original content
+                    postContent.html(currentContent);
+                });
+            });
+        });
+
+        $(document).ready(function () {
+            // Attach click event to the "Delete" links
+            $(".delete-link").on("click", function (e) {
+                e.preventDefault();
+
+                // Find the corresponding post container
+                var postContainer = $(this).closest(".post");
+
+                // Get the post ID
+                var postId = postContainer.data("post-id");
+
+                // Perform AJAX request to delete the post
+                $.ajax({
+                    url: "/Post/DeletePost", // Change the URL to your actual delete action
+                    type: "POST",
+                    data: { postId: postId },
+                    success: function () {
+                        // Remove the post container from the DOM
+                        postContainer.remove();
+                    }
+                });
+            });
+        });
+    </script>
+}

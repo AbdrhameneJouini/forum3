@@ -119,9 +119,13 @@
                 <div class="card row-hover pos-relative py-3 px-3 mb-3 border-warning border-top-0 border-right-0 border-bottom-0 rounded-0">
                     <div class="row align-items-center">
                         <div class="col-md-8 mb-3 mb-sm-0">
+                            <img alt="Avatar" class="rounded-circle mt-5" width="35px" src="@post?.CreatorUser.CheminAvatar" />
                             <h5>
+
+
                                 <a asp-controller="Post" asp-action="Index" asp-route-id="@post.PostID" class="text-primary">@post.Title</a>
                             </h5>
+
                             <p class="text-sm">
                                 <span class="op-6">Posted on @post.DateCreationMessage.ToString()</span>
 
@@ -141,7 +145,7 @@
                                     var timeDifferenceLastMessage = (DateTime.Now - (post.DateCreationLastMessage ?? DateTime.Now));
                                     var minutesAgoLastNessage = timeDifferenceLastMessage.TotalMinutes;
                                 }
-                                <a class="text-black" href="#">  @(minutesAgoLastNessage.ToString("F0")) minutes ago </a>
+                                <a class="text-black" href="#"> @(minutesAgoLastNessage.ToString("F0")) minutes ago </a>
 
 
 

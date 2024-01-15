@@ -1,6 +1,7 @@
 ﻿using forum.Data;
 using forum.Models;
 using forum.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -107,7 +108,8 @@ namespace forum.Controllers
             var newUser = new User()
             {
                 Email = registerViewModel.Email,
-                UserName = registerViewModel.UserName
+                UserName = registerViewModel.UserName,
+                CheminAvatar = "/uploads/Default_Avatar.jpg"
             };
             var newUserResponse = await _userManager.CreateAsync(newUser, registerViewModel.Password);
 
@@ -136,6 +138,98 @@ namespace forum.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            
+            var user = _context.Users.FirstOrDefault(u => u.Id == _userManager.GetUserId(HttpContext.User));
+            var ProfileViewModel = new ProfileViewModel()
+            {
+                UserName = user.UserName,
+                Signature = user.Signature,
+                Email = user.Email,
+                id = user.Id,
+                imageURL = user.CheminAvatar
+
+
+            };
+            return View(ProfileViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateProfile(ProfileViewModel model, [FromServices] IWebHostEnvironment webHostEnvironment)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+
+                // Update user properties based on the form inputs
+                user.UserName = model.UserName;
+                user.Signature = model.Signature;
+                user.Email = model.Email;
+
+                // Change password only if NewPassword is provided
+                if (!string.IsNullOrEmpty(model.NewPassword))
+                {
+                    var changePasswordResult = await _userManager.ChangePasswordAsync(user, null, model.NewPassword);
+                    if (!changePasswordResult.Succeeded)
+                    {
+                        // Handle password change failure (e.g., invalid password)
+                        foreach (var error in changePasswordResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+
+                        return View("Profile", model);
+                    }
+                }
+
+                if (model.AvatarImage != null)
+                {
+                    // Ensure the "uploads" folder exists
+                    string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "uploads");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + model.AvatarImage.FileName;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await model.AvatarImage.CopyToAsync(fileStream);
+                    }
+
+                    // Update the model with the image URL
+                    model.imageURL = "/uploads/" + uniqueFileName;
+                    user.CheminAvatar = model.imageURL;
+                }
+
+                // Save changes to the user
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (updateResult.Succeeded)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    // Handle update failure (e.g., validation errors)
+                    foreach (var error in updateResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+
+                    return View("Profile", model);
+                }
+            }
+
+            // ModelState is invalid; return to the form with validation errors
+            return View("Profile", model);
         }
 
 

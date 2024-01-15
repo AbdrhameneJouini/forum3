@@ -1,0 +1,123 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model forum.ViewModels.ProfileViewModel
+
+    @{
+        ViewBag.Title = "title";
+        Layout = "_Layout";
+    }
+
+
+    <script>
+            body {
+            background: rgb(99, 39, 120)
+        }
+
+        .form - control:focus {
+            box - shadow: none;
+            border - color: #BA68C8
+        }
+
+        .profile - button {
+            background: rgb(99, 39, 120);
+            box - shadow: none;
+            border: none
+        }
+
+        .profile - button:hover {
+            background: #682773
+        }
+
+        .profile - button:focus {
+            background: #682773;
+            box - shadow: none
+        }
+
+        .profile - button:active {
+            background: #682773;
+            box - shadow: none
+        }
+
+        .back:hover {
+            color: #682773;
+            cursor: pointer
+        }
+
+        .labels {
+            font - size: 11px
+        }
+
+        .add - experience:hover {
+            background: #BA68C8;
+            color: #fff;
+            cursor: pointer;
+            border: solid 1px #BA68C8
+        }
+    </script>
+
+
+    <h2>Profile of : @Model.UserName</h2>
+
+
+
+
+
+
+    <div class="container rounded bg-white mt-5 mb-5">
+    <form asp-controller="Account" asp-action="UpdateProfile" method="post" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-3 border-right">
+                <div class="d-flex flex-column align-items-center text-center p-3 py-5">
+                    <img  class="rounded-circle mt-5" width="150px" src="@Model.imageURL">
+                    <span class="font-weight-bold">@Model?.UserName</span>
+                    <span class="text-black-50">@Model?.Email</span><span> </span>
+                </div>
+            </div>
+            <div class="col-md-5 border-right">
+                <div class="p-3 py-5">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="text-right">Profile Settings</h4>
+                    </div>
+                    <input asp-for="id" hidden="true" value="@Model.id"/>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <label class="labels">Username</label>
+                            <input asp-for="UserName" class="form-control" placeholder="enter username" />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="labels">Signature</label>
+                            <input asp-for="Signature" class="form-control" placeholder="enter signature" />
+                            <span asp-validation-for="Signature" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="labels">Email Address</label>
+                            <input asp-for="Email" class="form-control" placeholder="enter email address" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="labels">Change password</label>
+                            <input asp-for="NewPassword" class="form-control" placeholder="enter new password" />
+                            <span asp-validation-for="NewPassword" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="labels">Confirm Change password</label>
+                            <input asp-for="ConfirmNewPassword" class="form-control" placeholder="confirm new password" />
+                            <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label asp-for="AvatarImage" class="control-label"></label>
+                            <input asp-for="AvatarImage" class="form-control" type="file">
+                            <span asp-validation-for="AvatarImage" class="text-danger"></span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="mt-5 text-center"><button class="btn btn-primary profile-button" type="submit">Save Profile</button></div>
+                </div>
+            </div>
+              
+        </div>
+        </form>
+    </div>

@@ -28,7 +28,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Account\Profile.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Post\Index.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\Account\Profile.cshtml" />
   </ItemGroup>
 
 </Project>

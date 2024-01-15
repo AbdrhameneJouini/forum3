@@ -24,8 +24,8 @@ namespace forum.Controllers
         public IActionResult Index(int? id)
         {
             var post = _context.Posts
-                .Include(p => p.Users)  // Ensure Users are loaded
-                .Include(p => p.ReferencedPosts)  // Ensure ReferencedPosts are loaded
+                .Include(p => p.Users)
+                .Include(p => p.ReferencedPosts)
                 .FirstOrDefault(p => p.Sujet && p.PostID == id);
 
             if (post != null)
@@ -37,11 +37,8 @@ namespace forum.Controllers
                     post.CreatorUser = creator;
                 }
 
-                // Filter out only the replies (posts where Sujet is false)
                 var replies = post.ReferencedPosts.Where(p => !p.Sujet).ToList();
 
-
-                // Loop through the ReferencedPosts to set the CreatorUser for each reply
                 foreach (var reply in replies)
                 {
                     var replyCreator = _context.Users.FirstOrDefault(u => u.Id == reply.userID);
@@ -49,24 +46,27 @@ namespace forum.Controllers
                     {
                         reply.CreatorUser = replyCreator;
                     }
-
-
                 }
-                
-                // Pass the main post and its replies to the view
+
+                var loggedUserId = _userManager.GetUserId(HttpContext.User);
+
+                // Determine if the user can edit the MainPost
+                var canEditMainPost = post.userID == loggedUserId;
+
+                // Determine if the user can edit each reply
+                var canEditReplies = replies.ToDictionary(reply => reply.PostID, reply => reply.userID == loggedUserId);
 
                 return View(new PostWithRepliesViewModel
                 {
                     MainPost = post,
-                    Replies = replies
-                }
-                
-                );
+                    Replies = replies,
+                    CanEditMainPost = canEditMainPost,
+                    CanEditReplies = canEditReplies
+                });
             }
 
             return NotFound();
         }
-
 
 
 
@@ -156,12 +156,10 @@ namespace forum.Controllers
                 var currentUser = post.Users.FirstOrDefault(u => u.Id == userId);
                 if (currentUser == null)
                 {
-                    // Add the current user to the post's Users
                     var user = await _userManager.FindByIdAsync(userId);
                     post.Users.Add(user);
                 }
 
-                // Create a new reply post
                 var replyPost = new Post
                 {
                     Message = message,
@@ -172,17 +170,14 @@ namespace forum.Controllers
                     userID = userId
                 };
 
-                // Add the reply post to the post's ReferencedPosts
                 if (post.ReferencedPosts == null)
                 {
                     post.ReferencedPosts = new List<Post>();
                 }
                 post.ReferencedPosts.Add(replyPost);
 
-                // Update DateCreationLastMessage of the main post
                 post.DateCreationLastMessage = DateTime.Now;
 
-                // Save changes to the database
                 await _context.SaveChangesAsync();
 
               
@@ -191,6 +186,54 @@ namespace forum.Controllers
             }
 
             return NotFound();
+        }
+
+
+        [HttpPost]
+        public IActionResult UpdatePost(int postId, string editedContent)
+        {
+          
+            var post = _context.Posts.Find(postId);
+
+
+
+
+            post.Message = editedContent;
+
+         
+            _context.SaveChanges();
+
+            return Ok(); 
+        }
+
+
+        [HttpPost]
+        public IActionResult DeletePost(int postId)
+        {
+         
+            var postToDelete = _context.Posts.FirstOrDefault(p => p.PostID == postId);
+
+            if (postToDelete == null)
+            {
+    
+                return NotFound();
+            }
+
+           
+            bool canDelete = true;
+
+            if (canDelete)
+            {
+                _context.Posts.Remove(postToDelete);
+                _context.SaveChanges();
+
+                return Ok();
+            }
+            else
+            {
+                
+                return Forbid();
+            }
         }
 
 
